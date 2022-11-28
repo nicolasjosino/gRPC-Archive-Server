@@ -1,0 +1,41 @@
+syntax = "proto3";
+package proto;
+
+option java_multiple_files = true;
+option java_package = "generated";
+
+service ArchiveManagerService {
+  rpc listFiles(Empty) returns (StringResponse);
+  rpc getArchive(Request) returns (ArchiveResponse);
+  rpc deleteArchive(Request) returns (APIResponse);
+  rpc listChildren(Request) returns (StringResponse);
+  rpc sendArchive(SendRequest) returns (APIResponse);
+  rpc pwd(Empty) returns (StringResponse);
+}
+
+message Empty {}
+
+message Request {
+  string name = 1;
+}
+
+message SendRequest {
+  Request name = 1;
+  bytes contents = 2;
+}
+
+message APIResponse {
+  string responseMessage = 1;
+  int32 responseCode = 2 ;
+}
+
+message StringResponse {
+  string contents = 1;
+  APIResponse response = 2;
+}
+
+message ArchiveResponse {
+  bytes contents = 1;
+  APIResponse response = 2;
+}
+
