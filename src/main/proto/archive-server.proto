@@ -5,12 +5,14 @@ option java_multiple_files = true;
 option java_package = "generated";
 
 service ArchiveManagerService {
-  rpc listFiles(Empty) returns (StringResponse);
+  rpc listFiles(Empty) returns (ContentsResponse);
   rpc getArchive(Request) returns (ArchiveResponse);
-  rpc deleteArchive(Request) returns (APIResponse);
-  rpc listChildren(Request) returns (StringResponse);
-  rpc sendArchive(SendRequest) returns (APIResponse);
-  rpc pwd(Empty) returns (StringResponse);
+  rpc deleteArchive(Request) returns (Response);
+  rpc listChildren(Request) returns (ContentsResponse);
+  rpc sendArchive(SendRequest) returns (Response);
+  rpc pwd(Empty) returns (ContentsResponse);
+  rpc changeDirectoryUp(Empty) returns (Response);
+  rpc changeDirectoryDown(Request) returns (Response);
 }
 
 message Empty {}
@@ -24,18 +26,17 @@ message SendRequest {
   bytes contents = 2;
 }
 
-message APIResponse {
+message Response {
   string responseMessage = 1;
-  int32 responseCode = 2 ;
 }
 
-message StringResponse {
+message ContentsResponse {
   string contents = 1;
-  APIResponse response = 2;
+  string responseMessage = 2;
 }
 
 message ArchiveResponse {
   bytes contents = 1;
-  APIResponse response = 2;
+  string responseMessage = 2;
 }
 

@@ -8,126 +8,97 @@ import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.Arrays;
 import java.util.Optional;
+import java.util.regex.Pattern;
 
 public class ArchiveManagerService extends ArchiveManagerServiceGrpc.ArchiveManagerServiceImplBase {
 
     private String path = "C:\\Users\\nicolas_josino\\IdeaProjects\\gRPC-Archive-Server\\archives";
 
     @Override
-    public void listFiles(Empty request, StreamObserver<StringResponse> responseObserver) {
-        StringResponse response;
-        APIResponse APIresponse;
-        String responseMessage;
-        int responseCode;
+    public void listFiles(Empty request, StreamObserver<ContentsResponse> responseObserver) {
+        ContentsResponse response;
         StringBuilder contents = new StringBuilder();
         File serverFolder = new File(path);
+        String responseMessage;
 
         if (serverFolder.exists()) {
             if (serverFolder.isDirectory()) {
-                System.out.println("Listing files:");
-
                 File[] dir = serverFolder.listFiles();
                 if (dir != null) {
                     for (File f : dir) {
                         contents.append(f.getName()).append(';');
                     }
                 }
-                responseMessage = "success";
-                responseCode = 200;
+                responseMessage = "Success";
             } else {
                 responseMessage = "Server is not a folder";
-                responseCode = 500;
             }
-        } else {
-            responseMessage = "File does not exist!";
-            responseCode = 500;
-        }
+        } else responseMessage = "Server folder does not exist!";
 
-        APIresponse = APIResponse.newBuilder().
-                setResponseCode(responseCode).
-                setResponseMessage(responseMessage).build();
-        response = StringResponse.newBuilder().
-                setResponse(APIresponse).
+        response = ContentsResponse.newBuilder().
                 setContents(contents.toString()).
-                build();
-
+                setResponseMessage(responseMessage).build();
         responseObserver.onNext(response);
         responseObserver.onCompleted();
     }
 
-    @Override
-    public void getArchive(Request request, StreamObserver<ArchiveResponse> responseObserver) {
-        ArchiveResponse response;
-        APIResponse APIresponse;
-        String responseMessage;
-        int responseCode;
+    public File findArchive(Request request) {
         File serverFolder = new File(path);
         File[] folderContents = serverFolder.listFiles();
-        byte[] contents = new byte[0];
 
         assert folderContents != null;
         Optional<File> archive = Arrays.stream(folderContents)
                 .filter(item -> request.getName().equals(item.getName()))
                 .findFirst();
 
-        if (archive.isPresent()) {
-            responseCode = 200;
-            responseMessage = "File found!";
+        return archive.orElse(null);
+    }
+
+    @Override
+    public void getArchive(Request request, StreamObserver<ArchiveResponse> responseObserver) {
+        ArchiveResponse response;
+        File archive = findArchive(request);
+
+        byte[] contents = new byte[0];
+        if (archive.exists()) {
             try {
-                contents = Files.readAllBytes(archive.get().toPath());
+                contents = Files.readAllBytes(archive.toPath());
             } catch (IOException e) {
                 throw new RuntimeException(e);
             }
         }
-        else {
-            responseCode = 400;
-            responseMessage = "File not found!";
-        }
-
-        APIresponse = APIResponse.newBuilder().
-                setResponseCode(responseCode).
-                setResponseMessage(responseMessage).build();
 
         response = ArchiveResponse.newBuilder().
-                setResponse(APIresponse).
                 setContents(ByteString.copyFrom(contents)).build();
-
         responseObserver.onNext(response);
         responseObserver.onCompleted();
     }
 
     @Override
-    public void deleteArchive(Request request, StreamObserver<APIResponse> responseObserver) {
+    public void deleteArchive(Request request, StreamObserver<Response> responseObserver) {
         super.deleteArchive(request, responseObserver);
     }
 
     @Override
-    public void listChildren(Request request, StreamObserver<StringResponse> responseObserver) {
-        StringResponse response;
-        APIResponse APIresponse;
+    public void listChildren(Request request, StreamObserver<ContentsResponse> responseObserver) {
+        ContentsResponse response;
         String responseMessage;
-        int responseCode;
         StringBuilder contents = new StringBuilder();
         File directory = Paths.get(path, request.getName()).toFile();
         File[] directoryContents = directory.listFiles();
 
         if (!directory.isDirectory()) {
-            responseCode = 500;
             responseMessage = "Request is not a directory!";
         } else {
             assert directoryContents != null;
             for (File f : directoryContents)
                 contents.append(f.getName()).append(';');
-            responseCode = 200;
             responseMessage = "Listing files from " + directory.getPath();
         }
 
-        APIresponse = APIResponse.newBuilder().
-                setResponseCode(responseCode).
-                setResponseMessage(responseMessage).build();
-        response = StringResponse.newBuilder().
-                setResponse(APIresponse).
+        response = ContentsResponse.newBuilder().
                 setContents(contents.toString()).
+                setResponseMessage(responseMessage).
                 build();
 
         responseObserver.onNext(response);
@@ -135,12 +106,45 @@ public class ArchiveManagerService extends ArchiveManagerServiceGrpc.ArchiveMana
     }
 
     @Override
-    public void sendArchive(SendRequest request, StreamObserver<APIResponse> responseObserver) {
+    public void sendArchive(SendRequest request, StreamObserver<Response> responseObserver) {
         super.sendArchive(request, responseObserver);
     }
 
     @Override
-    public void pwd(Empty request, StreamObserver<StringResponse> responseObserver) {
-        super.pwd(request, responseObserver);
+    public void pwd(Empty request, StreamObserver<ContentsResponse> responseObserver) {
+        ContentsResponse response = ContentsResponse.newBuilder().
+                setContents(path).build();
+        responseObserver.onNext(response);
+        responseObserver.onCompleted();
+    }
+
+    @Override
+    public void changeDirectoryUp(Empty request, StreamObserver<Response> responseObserver) {
+        String[] newPath = path.split(Pattern.quote(File.separator));
+        newPath = Arrays.copyOf(newPath, newPath.length - 1);
+
+        path = String.join("\\", newPath);
+
+        Response response = Response.newBuilder().
+                setResponseMessage("Path moved up to: " + path).build();
+        responseObserver.onNext(response);
+        responseObserver.onCompleted();
+    }
+
+    @Override
+    public void changeDirectoryDown(Request request, StreamObserver<Response> responseObserver) {
+        String responseMessage;
+        File newPathFile = findArchive(request);
+        if (newPathFile.exists()) {
+//            path += "\\" + request.getName();
+            path = newPathFile.getAbsolutePath();
+            responseMessage = "Path moved down to: " + path;
+        } else {
+            responseMessage = "Informed new path not found";
+        }
+
+        Response response = Response.newBuilder().setResponseMessage(responseMessage).build();
+        responseObserver.onNext(response);
+        responseObserver.onCompleted();
     }
 }
