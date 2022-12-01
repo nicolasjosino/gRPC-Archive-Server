@@ -10,7 +10,7 @@ service ArchiveManagerService {
   rpc deleteArchive(Request) returns (Response);
   rpc listChildren(Request) returns (ContentsResponse);
   rpc sendArchive(SendRequest) returns (Response);
-  rpc pwd(Empty) returns (ContentsResponse);
+  rpc pwd(Empty) returns (Response);
   rpc changeDirectoryUp(Empty) returns (Response);
   rpc changeDirectoryDown(Request) returns (Response);
 }
@@ -31,7 +31,7 @@ message Response {
 }
 
 message ContentsResponse {
-  string contents = 1;
+  repeated string contents = 1;
   string responseMessage = 2;
 }
 

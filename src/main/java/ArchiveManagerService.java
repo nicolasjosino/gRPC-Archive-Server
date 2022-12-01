@@ -6,7 +6,9 @@ import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.List;
 import java.util.Optional;
 import java.util.regex.Pattern;
 
@@ -17,7 +19,7 @@ public class ArchiveManagerService extends ArchiveManagerServiceGrpc.ArchiveMana
     @Override
     public void listFiles(Empty request, StreamObserver<ContentsResponse> responseObserver) {
         ContentsResponse response;
-        StringBuilder contents = new StringBuilder();
+        List<String> contents = new ArrayList<>();
         File serverFolder = new File(path);
         String responseMessage;
 
@@ -26,7 +28,7 @@ public class ArchiveManagerService extends ArchiveManagerServiceGrpc.ArchiveMana
                 File[] dir = serverFolder.listFiles();
                 if (dir != null) {
                     for (File f : dir) {
-                        contents.append(f.getName()).append(';');
+                        contents.add(f.getName());
                     }
                 }
                 responseMessage = "Success";
@@ -36,7 +38,7 @@ public class ArchiveManagerService extends ArchiveManagerServiceGrpc.ArchiveMana
         } else responseMessage = "Server folder does not exist!";
 
         response = ContentsResponse.newBuilder().
-                setContents(contents.toString()).
+                addAllContents(contents).
                 setResponseMessage(responseMessage).build();
         responseObserver.onNext(response);
         responseObserver.onCompleted();
@@ -60,7 +62,7 @@ public class ArchiveManagerService extends ArchiveManagerServiceGrpc.ArchiveMana
         File archive = findArchive(request);
 
         byte[] contents = new byte[0];
-        if (archive.exists()) {
+        if (archive != null) {
             try {
                 contents = Files.readAllBytes(archive.toPath());
             } catch (IOException e) {
@@ -83,7 +85,7 @@ public class ArchiveManagerService extends ArchiveManagerServiceGrpc.ArchiveMana
     public void listChildren(Request request, StreamObserver<ContentsResponse> responseObserver) {
         ContentsResponse response;
         String responseMessage;
-        StringBuilder contents = new StringBuilder();
+        List<String> contents = new ArrayList<>();
         File directory = Paths.get(path, request.getName()).toFile();
         File[] directoryContents = directory.listFiles();
 
@@ -92,12 +94,12 @@ public class ArchiveManagerService extends ArchiveManagerServiceGrpc.ArchiveMana
         } else {
             assert directoryContents != null;
             for (File f : directoryContents)
-                contents.append(f.getName()).append(';');
+                contents.add(f.getName());
             responseMessage = "Listing files from " + directory.getPath();
         }
 
         response = ContentsResponse.newBuilder().
-                setContents(contents.toString()).
+                addAllContents(contents).
                 setResponseMessage(responseMessage).
                 build();
 
@@ -111,9 +113,9 @@ public class ArchiveManagerService extends ArchiveManagerServiceGrpc.ArchiveMana
     }
 
     @Override
-    public void pwd(Empty request, StreamObserver<ContentsResponse> responseObserver) {
-        ContentsResponse response = ContentsResponse.newBuilder().
-                setContents(path).build();
+    public void pwd(Empty request, StreamObserver<Response> responseObserver) {
+        Response response = Response.newBuilder().
+                setResponseMessage(path).build();
         responseObserver.onNext(response);
         responseObserver.onCompleted();
     }
@@ -135,12 +137,11 @@ public class ArchiveManagerService extends ArchiveManagerServiceGrpc.ArchiveMana
     public void changeDirectoryDown(Request request, StreamObserver<Response> responseObserver) {
         String responseMessage;
         File newPathFile = findArchive(request);
-        if (newPathFile.exists()) {
-//            path += "\\" + request.getName();
+        if (newPathFile != null) {
             path = newPathFile.getAbsolutePath();
             responseMessage = "Path moved down to: " + path;
         } else {
-            responseMessage = "Informed new path not found";
+            responseMessage = "Informed path not found";
         }
 
         Response response = Response.newBuilder().setResponseMessage(responseMessage).build();
