@@ -125,7 +125,25 @@ public class ArchiveManagerService extends ArchiveManagerServiceGrpc.ArchiveMana
 
     @Override
     public void sendArchive(SendArchiveRequest request, StreamObserver<SendArchiveResponse> responseObserver) {
-        super.sendArchive(request, responseObserver);
+        File toSend = new File(path + "\\" + request.getName());
+        SendArchiveResponse response;
+        String responseMessage;
+
+        try {
+            if (toSend.createNewFile()) {
+                Files.write(toSend.toPath(), request.getContents().toByteArray());
+                responseMessage = toSend.getName() + " sent";
+            } else {
+                responseMessage = request.getName() + " already exists in path";
+            }
+
+            response = SendArchiveResponse.newBuilder().
+                    setResponseMessage(responseMessage).build();
+            responseObserver.onNext(response);
+            responseObserver.onCompleted();
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     @Override
