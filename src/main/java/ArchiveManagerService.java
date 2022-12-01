@@ -59,26 +59,42 @@ public class ArchiveManagerService extends ArchiveManagerServiceGrpc.ArchiveMana
     @Override
     public void getArchive(GetArchiveRequest request, StreamObserver<GetArchiveResponse> responseObserver) {
         GetArchiveResponse response;
+        String responseMessage;
         File archive = findArchive(request.getName());
 
         byte[] contents = new byte[0];
         if (archive != null) {
             try {
                 contents = Files.readAllBytes(archive.toPath());
+                responseMessage = Arrays.toString(contents);
             } catch (IOException e) {
                 throw new RuntimeException(e);
             }
-        }
+        } else responseMessage = request.getName() + " not found";
 
         response = GetArchiveResponse.newBuilder().
-                setContents(ByteString.copyFrom(contents)).build();
+                setContents(ByteString.copyFrom(contents)).
+                setResponseMessage(responseMessage).build();
         responseObserver.onNext(response);
         responseObserver.onCompleted();
     }
 
     @Override
     public void deleteArchive(DeleteArchiveRequest request, StreamObserver<DeleteArchiveResponse> responseObserver) {
-        super.deleteArchive(request, responseObserver);
+        File toDelete = findArchive(request.getName());
+        String responseMessage;
+        DeleteArchiveResponse response;
+
+        if (toDelete != null) {
+            if (toDelete.delete()) responseMessage = toDelete.getName() + " deleted";
+            else responseMessage = toDelete.getName() + " not deleted";
+        } else responseMessage = "File not found";
+
+        response = DeleteArchiveResponse.newBuilder().
+                setResponseMessage(responseMessage).build();
+
+        responseObserver.onNext(response);
+        responseObserver.onCompleted();
     }
 
     @Override
