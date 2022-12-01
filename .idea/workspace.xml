@@ -4,28 +4,12 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="6f827c6c-0c34-4dd2-aa0e-5701f50ead5a" name="Changes" comment="">
+    <list default="true" id="6f827c6c-0c34-4dd2-aa0e-5701f50ead5a" name="Changes" comment="Proto repeated implements">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/java/ArchiveManagerService.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/ArchiveManagerService.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/generated/APIResponse.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/generated/APIResponseOrBuilder.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/generated/ArchiveManagerServiceGrpc.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/generated/ArchiveResponse.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/generated/ArchiveResponseOrBuilder.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/generated/ArchiveServer.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/generated/Empty.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/generated/EmptyOrBuilder.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/generated/Request.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/generated/RequestOrBuilder.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/generated/SendRequest.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/generated/SendRequestOrBuilder.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/generated/StringResponse.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/generated/StringResponseOrBuilder.java" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/proto/archive-server.proto" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/proto/archive-server.proto" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/maven-archiver/pom.properties" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/target/maven-status/maven-compiler-plugin/compile/default-compile/createdFiles.lst" beforeDir="false" afterPath="$PROJECT_DIR$/target/maven-status/maven-compiler-plugin/compile/default-compile/createdFiles.lst" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/target/maven-status/maven-compiler-plugin/compile/default-compile/inputFiles.lst" beforeDir="false" afterPath="$PROJECT_DIR$/target/maven-status/maven-compiler-plugin/compile/default-compile/inputFiles.lst" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/maven-status/maven-compiler-plugin/testCompile/default-testCompile/inputFiles.lst" beforeDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -51,14 +35,14 @@
     <option name="hideEmptyMiddlePackages" value="true" />
     <option name="showLibraryContents" value="true" />
   </component>
-  <component name="PropertiesComponent"><![CDATA[{
-  "keyToString": {
-    "RunOnceActivity.OpenProjectViewOnStart": "true",
-    "RunOnceActivity.ShowReadmeOnStart": "true",
-    "last_opened_file_path": "C:/Users/nicolas_josino/IdeaProjects/gRPC-Archive-Server",
-    "settings.editor.selected.configurable": "preferences.editor.code.editing"
+  <component name="PropertiesComponent">{
+  &quot;keyToString&quot;: {
+    &quot;RunOnceActivity.OpenProjectViewOnStart&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
+    &quot;last_opened_file_path&quot;: &quot;C:/Users/nicolas_josino/IdeaProjects/gRPC-Archive-Server&quot;,
+    &quot;settings.editor.selected.configurable&quot;: &quot;preferences.editor.code.editing&quot;
   }
-}]]></component>
+}</component>
   <component name="RunManager">
     <configuration name="App" type="Application" factoryName="Application" temporary="true" nameIsGenerated="true">
       <option name="MAIN_CLASS_NAME" value="App" />
@@ -82,6 +66,21 @@
       <option name="presentableId" value="Default" />
       <updated>1668648421391</updated>
     </task>
+    <task id="LOCAL-00001" summary="Proto change and more implementations">
+      <created>1669842710290</created>
+      <option name="number" value="00001" />
+      <option name="presentableId" value="LOCAL-00001" />
+      <option name="project" value="LOCAL" />
+      <updated>1669842710290</updated>
+    </task>
+    <task id="LOCAL-00002" summary="Proto repeated implements">
+      <created>1669861415328</created>
+      <option name="number" value="00002" />
+      <option name="presentableId" value="LOCAL-00002" />
+      <option name="project" value="LOCAL" />
+      <updated>1669861415328</updated>
+    </task>
+    <option name="localTasksCounter" value="3" />
     <servers />
   </component>
   <component name="Vcs.Log.Tabs.Properties">
@@ -95,7 +94,7 @@
                   <entry key="branch">
                     <value>
                       <list>
-                        <option value="master" />
+                        <option value="main" />
                       </list>
                     </value>
                   </entry>
@@ -106,5 +105,10 @@
         </entry>
       </map>
     </option>
+  </component>
+  <component name="VcsManagerConfiguration">
+    <MESSAGE value="Proto change and more implementations" />
+    <MESSAGE value="Proto repeated implements" />
+    <option name="LAST_COMMIT_MESSAGE" value="Proto repeated implements" />
   </component>
 </project>

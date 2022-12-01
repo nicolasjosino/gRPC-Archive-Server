@@ -5,38 +5,75 @@ option java_multiple_files = true;
 option java_package = "generated";
 
 service ArchiveManagerService {
-  rpc listFiles(Empty) returns (ContentsResponse);
-  rpc getArchive(Request) returns (ArchiveResponse);
-  rpc deleteArchive(Request) returns (Response);
-  rpc listChildren(Request) returns (ContentsResponse);
-  rpc sendArchive(SendRequest) returns (Response);
-  rpc pwd(Empty) returns (Response);
-  rpc changeDirectoryUp(Empty) returns (Response);
-  rpc changeDirectoryDown(Request) returns (Response);
+  rpc ListFiles(ListFilesRequest) returns (ListFilesResponse);
+  rpc GetArchive(GetArchiveRequest) returns (GetArchiveResponse);
+  rpc DeleteArchive(DeleteArchiveRequest) returns (DeleteArchiveResponse);
+  rpc ListChildren(ListChildrenRequest) returns (ListChildrenResponse);
+  rpc SendArchive(SendArchiveRequest) returns (SendArchiveResponse);
+  rpc Pwd(PwdRequest) returns (PwdResponse);
+  rpc ChangeDirectoryUp(ChangeDirectoryUpRequest) returns (ChangeDirectoryUpResponse);
+  rpc ChangeDirectoryDown(ChangeDirectoryDownRequest) returns (ChangeDirectoryDownResponse);
 }
 
-message Empty {}
+message ListFilesRequest {}
 
-message Request {
+message ListFilesResponse {
+  repeated string contents = 1;
+  string response_message = 2;
+}
+
+message GetArchiveRequest {
   string name = 1;
 }
 
-message SendRequest {
-  Request name = 1;
+message GetArchiveResponse {
+  bytes contents = 1;
+  string response_message = 2;
+}
+
+message DeleteArchiveRequest {
+  string name = 1;
+}
+
+message DeleteArchiveResponse {
+  string response_message = 1;
+}
+
+message ListChildrenRequest {
+  string name = 1;
+}
+
+message ListChildrenResponse {
+  repeated string contents = 1;
+  string response_message = 2;
+}
+
+message SendArchiveRequest {
+  string name = 1;
   bytes contents = 2;
 }
 
-message Response {
-  string responseMessage = 1;
+message SendArchiveResponse {
+  string response_message = 1;
 }
 
-message ContentsResponse {
-  repeated string contents = 1;
-  string responseMessage = 2;
+message PwdRequest {}
+
+message PwdResponse {
+  string response_message = 1;
 }
 
-message ArchiveResponse {
-  bytes contents = 1;
-  string responseMessage = 2;
+message ChangeDirectoryUpRequest {}
+
+message ChangeDirectoryUpResponse {
+  string response_message = 1;
+}
+
+message ChangeDirectoryDownRequest {
+  string name = 1;
+}
+
+message ChangeDirectoryDownResponse {
+  string response_message = 1;
 }
 

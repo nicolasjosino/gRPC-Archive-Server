@@ -17,8 +17,8 @@ public class ArchiveManagerService extends ArchiveManagerServiceGrpc.ArchiveMana
     private String path = "C:\\Users\\nicolas_josino\\IdeaProjects\\gRPC-Archive-Server\\archives";
 
     @Override
-    public void listFiles(Empty request, StreamObserver<ContentsResponse> responseObserver) {
-        ContentsResponse response;
+    public void listFiles(ListFilesRequest request, StreamObserver<ListFilesResponse> responseObserver) {
+        ListFilesResponse response;
         List<String> contents = new ArrayList<>();
         File serverFolder = new File(path);
         String responseMessage;
@@ -37,29 +37,29 @@ public class ArchiveManagerService extends ArchiveManagerServiceGrpc.ArchiveMana
             }
         } else responseMessage = "Server folder does not exist!";
 
-        response = ContentsResponse.newBuilder().
+        response = ListFilesResponse.newBuilder().
                 addAllContents(contents).
                 setResponseMessage(responseMessage).build();
         responseObserver.onNext(response);
         responseObserver.onCompleted();
     }
 
-    public File findArchive(Request request) {
+    public File findArchive(String name) {
         File serverFolder = new File(path);
         File[] folderContents = serverFolder.listFiles();
 
         assert folderContents != null;
         Optional<File> archive = Arrays.stream(folderContents)
-                .filter(item -> request.getName().equals(item.getName()))
+                .filter(item -> name.equals(item.getName()))
                 .findFirst();
 
         return archive.orElse(null);
     }
 
     @Override
-    public void getArchive(Request request, StreamObserver<ArchiveResponse> responseObserver) {
-        ArchiveResponse response;
-        File archive = findArchive(request);
+    public void getArchive(GetArchiveRequest request, StreamObserver<GetArchiveResponse> responseObserver) {
+        GetArchiveResponse response;
+        File archive = findArchive(request.getName());
 
         byte[] contents = new byte[0];
         if (archive != null) {
@@ -70,20 +70,20 @@ public class ArchiveManagerService extends ArchiveManagerServiceGrpc.ArchiveMana
             }
         }
 
-        response = ArchiveResponse.newBuilder().
+        response = GetArchiveResponse.newBuilder().
                 setContents(ByteString.copyFrom(contents)).build();
         responseObserver.onNext(response);
         responseObserver.onCompleted();
     }
 
     @Override
-    public void deleteArchive(Request request, StreamObserver<Response> responseObserver) {
+    public void deleteArchive(DeleteArchiveRequest request, StreamObserver<DeleteArchiveResponse> responseObserver) {
         super.deleteArchive(request, responseObserver);
     }
 
     @Override
-    public void listChildren(Request request, StreamObserver<ContentsResponse> responseObserver) {
-        ContentsResponse response;
+    public void listChildren(ListChildrenRequest request, StreamObserver<ListChildrenResponse> responseObserver) {
+        ListChildrenResponse response;
         String responseMessage;
         List<String> contents = new ArrayList<>();
         File directory = Paths.get(path, request.getName()).toFile();
@@ -98,7 +98,7 @@ public class ArchiveManagerService extends ArchiveManagerServiceGrpc.ArchiveMana
             responseMessage = "Listing files from " + directory.getPath();
         }
 
-        response = ContentsResponse.newBuilder().
+        response = ListChildrenResponse.newBuilder().
                 addAllContents(contents).
                 setResponseMessage(responseMessage).
                 build();
@@ -108,35 +108,35 @@ public class ArchiveManagerService extends ArchiveManagerServiceGrpc.ArchiveMana
     }
 
     @Override
-    public void sendArchive(SendRequest request, StreamObserver<Response> responseObserver) {
+    public void sendArchive(SendArchiveRequest request, StreamObserver<SendArchiveResponse> responseObserver) {
         super.sendArchive(request, responseObserver);
     }
 
     @Override
-    public void pwd(Empty request, StreamObserver<Response> responseObserver) {
-        Response response = Response.newBuilder().
+    public void pwd(PwdRequest request, StreamObserver<PwdResponse> responseObserver) {
+        PwdResponse response = PwdResponse.newBuilder().
                 setResponseMessage(path).build();
         responseObserver.onNext(response);
         responseObserver.onCompleted();
     }
 
     @Override
-    public void changeDirectoryUp(Empty request, StreamObserver<Response> responseObserver) {
+    public void changeDirectoryUp(ChangeDirectoryUpRequest request, StreamObserver<ChangeDirectoryUpResponse> responseObserver) {
         String[] newPath = path.split(Pattern.quote(File.separator));
         newPath = Arrays.copyOf(newPath, newPath.length - 1);
 
         path = String.join("\\", newPath);
 
-        Response response = Response.newBuilder().
+        ChangeDirectoryUpResponse response = ChangeDirectoryUpResponse.newBuilder().
                 setResponseMessage("Path moved up to: " + path).build();
         responseObserver.onNext(response);
         responseObserver.onCompleted();
     }
 
     @Override
-    public void changeDirectoryDown(Request request, StreamObserver<Response> responseObserver) {
+    public void changeDirectoryDown(ChangeDirectoryDownRequest request, StreamObserver<ChangeDirectoryDownResponse> responseObserver) {
         String responseMessage;
-        File newPathFile = findArchive(request);
+        File newPathFile = findArchive(request.getName());
         if (newPathFile != null) {
             path = newPathFile.getAbsolutePath();
             responseMessage = "Path moved down to: " + path;
@@ -144,7 +144,7 @@ public class ArchiveManagerService extends ArchiveManagerServiceGrpc.ArchiveMana
             responseMessage = "Informed path not found";
         }
 
-        Response response = Response.newBuilder().setResponseMessage(responseMessage).build();
+        ChangeDirectoryDownResponse response = ChangeDirectoryDownResponse.newBuilder().setResponseMessage(responseMessage).build();
         responseObserver.onNext(response);
         responseObserver.onCompleted();
     }
