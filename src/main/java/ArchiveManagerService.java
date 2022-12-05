@@ -14,7 +14,7 @@ import java.util.regex.Pattern;
 
 public class ArchiveManagerService extends ArchiveManagerServiceGrpc.ArchiveManagerServiceImplBase {
 
-    private String path = "C:\\Users\\nicolas_josino\\IdeaProjects\\gRPC-Archive-Server\\archives";
+    private String path = System.getProperty("user.dir");
 
     @Override
     public void listFiles(ListFilesRequest request, StreamObserver<ListFilesResponse> responseObserver) {
@@ -66,7 +66,7 @@ public class ArchiveManagerService extends ArchiveManagerServiceGrpc.ArchiveMana
         if (archive != null) {
             try {
                 contents = Files.readAllBytes(archive.toPath());
-                responseMessage = Arrays.toString(contents);
+                responseMessage = request.getName() + " found.";
             } catch (IOException e) {
                 throw new RuntimeException(e);
             }
@@ -86,8 +86,10 @@ public class ArchiveManagerService extends ArchiveManagerServiceGrpc.ArchiveMana
         DeleteArchiveResponse response;
 
         if (toDelete != null) {
-            if (toDelete.delete()) responseMessage = toDelete.getName() + " deleted";
-            else responseMessage = toDelete.getName() + " not deleted";
+            if (toDelete.delete())
+                responseMessage = toDelete.getName() + " deleted";
+            else
+                responseMessage = toDelete.getName() + " not deleted";
         } else responseMessage = "File not found";
 
         response = DeleteArchiveResponse.newBuilder().
